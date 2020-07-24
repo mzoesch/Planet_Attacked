@@ -9,7 +9,7 @@ def setting_up_the_screen():
 
     # Window name
 
-    pygame.display.set_caption("Space Invaders @Magnus Zoeschinger")
+    pygame.display.set_caption("Space Attackers @Magnus Zoeschinger")
 
     # What you see when switching between apps
 
