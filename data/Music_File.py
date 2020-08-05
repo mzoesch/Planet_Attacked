@@ -1,20 +1,22 @@
 import random
 import pygame
+from data.Resources_Loading_File import SONG_ONE
+from data.Resources_Loading_File import SONG_TWO
 
-# Random Music
+# Random background music
 # Music lives forever
 
 next_song = None
 stop_music = False
 
 # All the songs that can be played
-
 background_songs = [
-        "resources/sounds/Background-Space_Invaders(2).wav",
-        "resources/sounds/Background-Space_Invaders(1).wav"
+        SONG_ONE,
+        SONG_TWO
     ]
 
 
+# The actual function that plays the music
 def play_random_songs():
 
     global next_song
@@ -29,4 +31,3 @@ def play_random_songs():
         pygame.mixer.music.load(next_song)
 
         pygame.mixer.music.play()
-
