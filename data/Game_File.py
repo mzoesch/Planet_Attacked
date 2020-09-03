@@ -19,6 +19,7 @@ pygame.init()
 
 # Setting up variables that are used everywhere
 score_value = 0
+mainexplosions = []
 
 current_width = 0  # Should be "None" but than the IDLE will show so many warnings ;-(
 current_height = 0
@@ -32,6 +33,74 @@ def currents():
     # Checking the size of the window
     current_width, _ = pygame.display.get_surface().get_size()
     _, current_height = pygame.display.get_surface().get_size()
+
+
+# Explosion class
+class Explosion:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.to_generate = 10
+        self.particles_up = []
+        self.particles_right = []
+        self.particles_down = []
+        self.particles_left = []
+        self.particles_left_up = True
+        self.particles_left_right = True
+        self.particles_left_down = True
+        self.particles_left_left = True
+        self.particles_in_game = True
+
+    def draw(self, window):
+        if self.to_generate > 0:
+            self.particles_up.append([[self.x, self.y], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 5)])
+            self.particles_right.append([[self.x, self.y], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 5)])
+            self.particles_down.append([[self.x, self.y], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 5)])
+            self.particles_left.append([[self.x, self.y], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 5)])
+            self.to_generate -= 1
+
+        for particle in self.particles_up:
+            particle[0][0] += particle[1][0]
+            particle[0][1] += particle[1][1]
+            particle[2] -= 0.1
+            pygame.draw.circle(window, (255, 255, 255), [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
+            if particle[2] <= 0:
+                self.particles_up.remove(particle)
+            if not self.particles_up:
+                self.particles_left_up = False
+
+        for particle in self.particles_right:
+            particle[0][0] -= particle[1][1]
+            particle[0][1] += particle[1][0]
+            particle[2] -= 0.1
+            pygame.draw.circle(window, (255, 255, 255), [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
+            if particle[2] <= 0:
+                self.particles_right.remove(particle)
+            if not self.particles_right:
+                self.particles_left_right = False
+
+        for particle in self.particles_down:
+            particle[0][0] += particle[1][0]
+            particle[0][1] -= particle[1][1]
+            particle[2] -= 0.1
+            pygame.draw.circle(window, (255, 255, 255), [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
+            if particle[2] <= 0:
+                self.particles_down.remove(particle)
+            if not self.particles_down:
+                self.particles_left_down = False
+
+        for particle in self.particles_left:
+            particle[0][0] += particle[1][1]
+            particle[0][1] += particle[1][0]
+            particle[2] -= 0.1
+            pygame.draw.circle(window, (255, 255, 255), [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
+            if particle[2] <= 0:
+                self.particles_left.remove(particle)
+            if not self.particles_left:
+                self.particles_left_left = False
+
+        if not self.particles_left_up and self.particles_left_right and self.particles_left_down and self.particles_left_left:
+            self.particles_in_game = False
 
 
 # Laser class
@@ -150,6 +219,11 @@ class Player(Ship):
                         # Playing explosion sound
                         explosion_sound = pygame.mixer.Sound(SHIP_EXPLOSION)
                         explosion_sound.play()
+                        for explosion in range(1):
+                            explosion = Explosion(enemy.x, enemy.y)
+                            explosion.x += 35
+                            explosion.y += 35
+                            mainexplosions.append(explosion)
 
                         # Respawns the enemy that was exploded
                         enemy.y = random.randrange(-100, 0) - enemy.get_height()
@@ -212,7 +286,7 @@ def collide(obj1, obj2):
     return obj1.mask.overlap(obj2.mask, (int(offset_x), int(offset_y))) is not None
 
 
-# Game loop
+# Game function
 def game():
 
     # Making score_value global
@@ -235,6 +309,13 @@ def game():
         # Draws the enemies
         for enemy_drawing in enemies:
             enemy_drawing.draw(gamescreen)
+
+        # Draws the explosion of an enemy
+        for explosion in mainexplosions:
+            if explosion.particles_in_game:
+                explosion.draw(gamescreen)
+            else:
+                mainexplosions.remove(explosion)
 
         # Draws the player
         player.draw(gamescreen)
@@ -421,7 +502,6 @@ def game():
                     enemy.shoot()
 
             # Creating more enemies while the score is going upwards
-
             if score_value == 2 and enemies_in_game == 1:
 
                 # Adds for more enemies
