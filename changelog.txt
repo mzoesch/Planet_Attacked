@@ -1,0 +1,21 @@
+--Version 1.2.2--
+Added Explosions
+
+---------------------------------------
+
+Code based:
+
+Nothing
+
+---------------------------------------
+
+User based:
+
+
+Explosions are now also visible when the enemy crashes with the players ship
+
+---------------------------------------
+
+Date: 03.09.2020
+
+---------------------------------------
