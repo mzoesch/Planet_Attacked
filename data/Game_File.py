@@ -216,14 +216,14 @@ class Player(Ship):
                 for enemy in enemies:
                     if laser.collision(enemy):
 
-                        # Playing explosion sound
-                        explosion_sound = pygame.mixer.Sound(SHIP_EXPLOSION)
-                        explosion_sound.play()
+                        # If the ship laser has collided with the enemy
                         for explosion in range(1):
                             explosion = Explosion(enemy.x, enemy.y)
                             explosion.x += 35
                             explosion.y += 35
                             mainexplosions.append(explosion)
+                        explosion_sound = pygame.mixer.Sound(SHIP_EXPLOSION)
+                        explosion_sound.play()
 
                         # Respawns the enemy that was exploded
                         enemy.y = random.randrange(-100, 0) - enemy.get_height()
@@ -514,6 +514,13 @@ def game():
 
             # Spawns the enemy above the screen when it has collided with the player
             if collide(enemy, player):
+                for explosion in range(1):
+                    explosion = Explosion(enemy.x, enemy.y)
+                    explosion.x += 35
+                    explosion.y += 35
+                    mainexplosions.append(explosion)
+                explosion_sound = pygame.mixer.Sound(SHIP_EXPLOSION)
+                explosion_sound.play()
                 player.health -= 20
                 enemy.y = random.randrange(-100, 0) - enemy.get_height()
                 enemy.x = random.randrange(0, current_width - enemy.get_width())
