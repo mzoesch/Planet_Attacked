@@ -1,21 +1,23 @@
---Version 1.2.2--
-Added Explosions
+--Version 1.3.0--
+Added healing pools
 
 ---------------------------------------
 
 Code based:
 
-Nothing
+
+two imiages were added for the pools... A green plus and a red one
 
 ---------------------------------------
 
 User based:
 
 
-Explosions are now also visible when the enemy crashes with the players ship
+Player will get two different healing pools - a green one for 25% healing and a red one for 50% healing.
+after the score raises up 17 more points a green one will appear and everery 5 pools a red one will appear.
 
 ---------------------------------------
 
-Date: 03.09.2020
+Date: 20.09.2020
 
 ---------------------------------------

@@ -24,14 +24,16 @@ IMG_ENEMY_LASER_RED = pygame.image.load(os.path.join("resources/graphics", "Enem
 IMG_ENEMY_LASER_GREEN = pygame.image.load(os.path.join("resources/graphics", "Enemy_Laser_Green.png"))
 IMG_ENEMY_LASER_BLUE = pygame.image.load(os.path.join("resources/graphics", "Enemy_Laser_Blue.png"))
 
+# Healing Pools
+IMG_HEALING_POOL_25 = pygame.image.load(os.path.join("resources/graphics", "Healing_Pool_25.png"))
+IMG_HEALING_POOL_50 = pygame.image.load(os.path.join("resources/graphics", "Healing_Pool_50.png"))
+
 # Loading wav
 
 # Music
-
 SONG_ONE = "resources/music/Background_(1).wav"
 SONG_TWO = "resources/music/Background_(2).wav"
 
 # Sounds
-
 SHIP_EXPLOSION = "resources/sounds/Explosion.wav"
 SHOOTING_LASER = "resources/sounds/Laser_Shooting.wav"

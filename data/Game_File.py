@@ -11,6 +11,8 @@ from data.Resources_Loading_File import IMG_ENEMY_SHIP_RED
 from data.Resources_Loading_File import IMG_PLAYER_SHIP
 from data.Resources_Loading_File import IMG_PLAYER_LASER
 from data.Resources_Loading_File import SHIP_EXPLOSION
+from data.Resources_Loading_File import IMG_HEALING_POOL_25
+from data.Resources_Loading_File import IMG_HEALING_POOL_50
 
 # Initialize the font
 pygame.font.init()
@@ -19,20 +21,29 @@ pygame.init()
 
 # Setting up variables that are used everywhere
 score_value = 0
+small_pool = 0
 mainexplosions = []
+pools = []
 
 current_width = 0  # Should be "None" but than the IDLE will show so many warnings ;-(
 current_height = 0
 
 
 def currents():
-
     global current_width
     global current_height
 
     # Checking the size of the window
     current_width, _ = pygame.display.get_surface().get_size()
     _, current_height = pygame.display.get_surface().get_size()
+
+
+# Adding to score
+def score_adding(amount):
+    global small_pool
+    global score_value
+    score_value += amount
+    small_pool += amount
 
 
 # Explosion class
@@ -235,7 +246,7 @@ class Player(Ship):
                         ])
                         if laser in self.lasers:
                             self.lasers.remove(laser)
-                        score_value += 1
+                        score_adding(1)
 
     # Draws the player
     def draw(self, window):
@@ -250,7 +261,6 @@ class Player(Ship):
 
 # Enemy class
 class Enemy(Ship):
-
     # Each ship that can be created
     COLOR_MAP = {
         "red": (pygame.transform.scale(IMG_ENEMY_SHIP_RED, (70, 70)), pygame.transform.scale(IMG_ENEMY_LASER_RED, (70, 70))),
@@ -279,6 +289,41 @@ class Enemy(Ship):
             self.cool_down_counter = 1
 
 
+# Healing pool class
+class Healing:
+    def __init__(self, power):
+        self.x = random.randrange(0, current_width - self.get_width())
+        self.y = random.randrange(-100, 0 - (self.get_height()))
+
+        self.power = power
+        if self.power == 25:
+            self.img = pygame.transform.scale(IMG_HEALING_POOL_25, (25, 25))
+        elif self.power == 50:
+            self.img = pygame.transform.scale(IMG_HEALING_POOL_50, (25, 25))
+
+        self.mask = pygame.mask.from_surface(self.img)
+
+    # Drawing function
+    def draw(self, screen, velocity):
+        screen.blit(self.img, (self.x, self.y))
+        self.move(velocity)
+
+    def move(self, velocity):
+        self.y += velocity
+
+    # Gets the width of the pool
+    @staticmethod
+    def get_width():
+        return 25  # AttributeError: 'Healing' object has no attribute 'img'
+        # return self.img.get_width()
+
+    # Gets the height of the pool
+    @staticmethod
+    def get_height():
+        return 25  # AttributeError: 'Healing' object has no attribute 'img'
+        # return self.img.get_height()
+
+
 # Detects if objects have been collided
 def collide(obj1, obj2):
     offset_x = obj2.x - obj1.x
@@ -289,8 +334,9 @@ def collide(obj1, obj2):
 # Game function
 def game():
 
-    # Making score_value global
+    # Making variables global
     global score_value
+    global small_pool
 
     # Draws everything
     def draw_current_frame():
@@ -311,11 +357,15 @@ def game():
             enemy_drawing.draw(gamescreen)
 
         # Draws the explosion of an enemy
-        for explosion in mainexplosions:
-            if explosion.particles_in_game:
-                explosion.draw(gamescreen)
+        for current_explosion in mainexplosions:
+            if current_explosion.particles_in_game:
+                current_explosion.draw(gamescreen)
             else:
-                mainexplosions.remove(explosion)
+                mainexplosions.remove(current_explosion)
+
+        # Drawing healing pools
+        for current_pool in pools:
+            current_pool.draw(gamescreen, healing_velocity)
 
         # Draws the player
         player.draw(gamescreen)
@@ -424,6 +474,9 @@ def game():
     skip_game_over_text = False
     enemy_velocity = 1
     player_velocity = 5
+    healing_velocity = 0.5
+    big_pool = 0
+
     laser_velocity = 5
     if score_value != 0:
         score_value = 0
@@ -529,7 +582,7 @@ def game():
                     (pygame.transform.scale(IMG_ENEMY_SHIP_BLUE, (70, 70)), pygame.transform.scale(IMG_ENEMY_LASER_BLUE, (70, 70))),
                     (pygame.transform.scale(IMG_ENEMY_SHIP_GREEN, (70, 70)), pygame.transform.scale(IMG_ENEMY_LASER_GREEN, (70, 70)))
                 ])
-                score_value += 2
+                score_adding(2)
 
             # Detects if an enemy has crossed the "line"
             elif enemy.y > current_height:  # Standard: current_height
@@ -541,6 +594,29 @@ def game():
                     (pygame.transform.scale(IMG_ENEMY_SHIP_BLUE, (70, 70)), pygame.transform.scale(IMG_ENEMY_LASER_BLUE, (70, 70))),
                     (pygame.transform.scale(IMG_ENEMY_SHIP_GREEN, (70, 70)), pygame.transform.scale(IMG_ENEMY_LASER_GREEN, (70, 70)))
                 ])
+
+        # Creates the two different types of healing pools
+        if small_pool > 17 and not big_pool == 5:
+            for pool in range(1):
+                pool = Healing(25)
+                pools.append(pool)
+            small_pool = 0
+        elif small_pool > 17 and big_pool == 5:
+            for pool in range(1):
+                pool = Healing(50)
+                pools.append(pool)
+            small_pool = 0
+            big_pool = 0
+
+        # Removes Healing pool when it has been collided with the player
+        for pool in pools:
+            if collide(pool, player):
+                pools.remove(pool)
+                player.health += pool.power
+
+            # Removes a healing pool when it has crossed the bottom of the screen
+            if pool.y > current_height:
+                pools.remove(pool)
 
         # Moves the lasers of the player and detects if they have been collided with an other object
         player.move_lasers(-laser_velocity, enemies)
