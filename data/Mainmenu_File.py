@@ -4,6 +4,7 @@
 import pygame
 from data.WindowSize_File import *
 from data.Game_File import game
+from data.Tutorial_File import tutorial
 import os
 
 # Creates the menu screen
@@ -141,6 +142,11 @@ def mainmenu():
                     # Exits fullscreen
                     else:
                         menuscreen = pygame.display.set_mode((exit_fullscreen_past_width, exit_fullscreen_past_height), pygame.RESIZABLE)
+
+                # TODO: A Tutorial should be added; Maybe with some buttons - should be at the end of the project
+                # Entering tutorial
+                if event.key == pygame.K_t:
+                    tutorial()
 
                 # Quitting the mainmenu by pressing "Q"
                 if event.key == pygame.K_q:

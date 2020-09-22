@@ -1,23 +1,24 @@
---Version 1.3.0--
-Added healing pools
+--Version 1.4.0--
+Added the posibility to pause the game
 
 ---------------------------------------
 
 Code based:
 
 
-two imiages were added for the pools... A green plus and a red one
+three files were added.
+1. "Pause_Menu_File.py" here is the pause menu programmed.
+2. "sv_pm.txt" An extra File where the current score is written in when entering the pause menu.
+3. "Tutorial_File.py" the tutorial will be programmed here.
 
 ---------------------------------------
 
 User based:
 
 
-Player will get two different healing pools - a green one for 25% healing and a red one for 50% healing.
-after the score raises up 17 more points a green one will appear and everery 5 pools a red one will appear.
-
+the Player now can enter the pause menu by pressing ESCAPE and can colse it again by the same key.
 ---------------------------------------
 
-Date: 20.09.2020
+Date: 22.09.2020
 
 ---------------------------------------

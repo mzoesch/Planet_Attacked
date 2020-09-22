@@ -9,6 +9,7 @@ from data.Resources_Loading_File import SONG_TWO
 next_song = None
 stop_music = False
 
+# TODO: Maybe add some new songs
 # All the songs that can be played
 background_songs = [
         SONG_ONE,

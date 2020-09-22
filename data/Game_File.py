@@ -2,6 +2,7 @@ import os
 import pygame
 import random
 from data.Music_File import play_random_songs
+from data.Pause_Menu_File import pausemenu
 from data.Resources_Loading_File import IMG_ENEMY_LASER_BLUE
 from data.Resources_Loading_File import IMG_ENEMY_LASER_RED
 from data.Resources_Loading_File import IMG_ENEMY_LASER_GREEN
@@ -13,6 +14,7 @@ from data.Resources_Loading_File import IMG_PLAYER_LASER
 from data.Resources_Loading_File import SHIP_EXPLOSION
 from data.Resources_Loading_File import IMG_HEALING_POOL_25
 from data.Resources_Loading_File import IMG_HEALING_POOL_50
+from data.Resources_Loading_File import IMG_SHIELD_POWER_UP
 
 # Initialize the font
 pygame.font.init()
@@ -22,6 +24,7 @@ pygame.init()
 # Setting up variables that are used everywhere
 score_value = 0
 small_pool = 0
+shield_counter = 0
 mainexplosions = []
 pools = []
 
@@ -29,6 +32,7 @@ current_width = 0  # Should be "None" but than the IDLE will show so many warnin
 current_height = 0
 
 
+# Getting the size values of the current window
 def currents():
     global current_width
     global current_height
@@ -42,8 +46,11 @@ def currents():
 def score_adding(amount):
     global small_pool
     global score_value
+    global shield_counter
+
     score_value += amount
     small_pool += amount
+    shield_counter += amount
 
 
 # Explosion class
@@ -175,7 +182,10 @@ class Ship:
             if laser.off_screen():
                 self.lasers.remove(laser)
             elif laser.collision(player):
-                player.health -= 10
+                if player.shield > 9:
+                    player.shield -= 10
+                else:
+                    player.health -= 10
                 self.lasers.remove(laser)
 
     # Counts the cooldown
@@ -204,12 +214,15 @@ class Ship:
 # Player class
 class Player(Ship):
 
-    def __init__(self, x, y, health=100):
+    def __init__(self, x, y, health=100, shield=0):
         super().__init__(x, y, health)
         self.ship_img = pygame.transform.scale(IMG_PLAYER_SHIP, (70, 70))
         self.laser_img = pygame.transform.scale(IMG_PLAYER_LASER, (70, 70))
         self.laser_img_height = 70
         self.mask = pygame.mask.from_surface(self.ship_img)
+        self.shield = shield
+        self.max_shield = 100
+        self.shield_counter = 0
         self.max_health = health
 
     # Moves the lasers and deletes them
@@ -251,12 +264,43 @@ class Player(Ship):
     # Draws the player
     def draw(self, window):
         super().draw(window)
+        self.shieldbar(window)
         self.healthbar(window)
+        self.adds_shield()
+        self.checking_health()
+        self.checking_shield()
 
     # Healthbar drawing
     def healthbar(self, window):
-        pygame.draw.rect(window, (255, 0, 0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
-        pygame.draw.rect(window, (0, 255, 0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health / self.max_health), 10))
+        if self.shield == 0:
+            pygame.draw.rect(window, (255, 0, 0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
+            pygame.draw.rect(window, (0, 255, 0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health / self.max_health), 10))
+        else:
+            pygame.draw.rect(window, (255, 0, 0), (self.x, self.y + self.ship_img.get_height() + 23, self.ship_img.get_width(), 10))
+            pygame.draw.rect(window, (0, 255, 0), (self.x, self.y + self.ship_img.get_height() + 23, self.ship_img.get_width() * (self.health / self.max_health), 10))
+
+    # Shieldbar drawing
+    def shieldbar(self, window):
+        if self.shield > 0:
+            pygame.draw.rect(window, (0, 0, 100), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
+            pygame.draw.rect(window, (0, 0, 255), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.shield / self.max_shield), 10))
+
+    # Checks that the health won't be more than a 100
+    def checking_health(self):
+        if self.health > self.max_health:
+            self.health = self.max_health
+
+    # Adds shield health over time
+    def adds_shield(self):
+        self.shield_counter += 1
+        if self.shield_counter > 59 and self.shield < 100:
+            self.shield += 1
+            self.shield_counter = 0
+
+    # Checks that the shield won't be more than a 100
+    def checking_shield(self):
+        if self.shield > self.max_shield:
+            self.shield = self.max_shield
 
 
 # Enemy class
@@ -324,6 +368,39 @@ class Healing:
         # return self.img.get_height()
 
 
+# Shield power up class
+class Shield:
+    def __init__(self):
+        self.x = random.randrange(0, current_width - self.get_width())
+        self.y = random.randrange(-100, 0 - (self.get_height()))
+
+        self.img = pygame.transform.scale(IMG_SHIELD_POWER_UP, (25, 25))
+        self.mask = pygame.mask.from_surface(self.img)
+
+    def draw(self, screen, velocity):
+        screen.blit(self.img, (self.x, self.y))
+        self.move(velocity)
+
+    def move(self, velocity):
+        self.y += velocity
+
+    # Gets the width of the power up
+    @staticmethod
+    def get_width():
+        return 25  # AttributeError: 'Shield' object has no attribute 'img'
+        # return self.img.get_width()
+
+    # Gets the height of the power up
+    @staticmethod
+    def get_height():
+        return 25  # AttributeError: 'Shield' object has no attribute 'img'
+        # return self.img.get_height()
+
+
+# TODO: Placements, structures that you can shoot through but enemies can't (Class)
+# TODO: New Hard Enemy, walks across the screen, but doesn't shoot - It has to touch the "line" (Class)
+# TODO: Power up, faster shooting (Class)
+
 # Detects if objects have been collided
 def collide(obj1, obj2):
     offset_x = obj2.x - obj1.x
@@ -337,6 +414,7 @@ def game():
     # Making variables global
     global score_value
     global small_pool
+    global shield_counter
 
     # Draws everything
     def draw_current_frame():
@@ -345,8 +423,8 @@ def game():
         gamescreen.blit(game_background, (0, 0))
 
         # Renders labels
-        lives_label = standard_font.render(f"Lives: {lives}", True, (255, 255, 255))
-        score_label = standard_font.render(f"Score: {score_value}", True, (255, 255, 255))
+        lives_label = standard_font.render(f"Lives: {lives}", True, WHITE)
+        score_label = standard_font.render(f"Score: {score_value}", True, WHITE)
 
         # Draws the rendered labels
         gamescreen.blit(lives_label, (10, 10))
@@ -366,6 +444,10 @@ def game():
         # Drawing healing pools
         for current_pool in pools:
             current_pool.draw(gamescreen, healing_velocity)
+
+        # Drawing shield power up
+        for current_shield in shields:
+            current_shield.draw(gamescreen, shield_velocity)
 
         # Draws the player
         player.draw(gamescreen)
@@ -458,9 +540,11 @@ def game():
     # Making the background that is used when you die, the right size
     gameover_background = pygame.transform.scale(pygame.image.load(os.path.join("resources/backgrounds", "Standard.png")), (current_width, current_height))
 
-    # Creating fonts
-    # Standard font
+    # Creating a font
     standard_font = pygame.font.SysFont("freesansbold.ttf", 64)
+
+    # Colors
+    WHITE = pygame.Color("white")
 
     # The number of enemies created each wave
     # Starting the game with one enemy
@@ -476,7 +560,8 @@ def game():
     player_velocity = 5
     healing_velocity = 0.5
     big_pool = 0
-
+    shields = []
+    shield_velocity = 0.5
     laser_velocity = 5
     if score_value != 0:
         score_value = 0
@@ -537,6 +622,22 @@ def game():
                     skip_game_over_text = True
                     pygame.mixer.quit()
                     break
+
+                # Entering pause menu by pressing "ESCAPE"
+                if event.key == pygame.K_ESCAPE:
+
+                    # Pauses music
+                    pygame.mixer_music.pause()
+
+                    # Writes the score value to a file
+                    with open("assets/sv_pm.txt", "w") as sv_pmf:
+                        sv_pmf.write('%d' % score_value)
+
+                    # Calling pausemenu
+                    pausemenu()
+
+                    # Lets python continue the music
+                    pygame.mixer_music.unpause()
 
         # Lets you move
         movement()
@@ -601,6 +702,7 @@ def game():
                 pool = Healing(25)
                 pools.append(pool)
             small_pool = 0
+            big_pool += 1
         elif small_pool > 17 and big_pool == 5:
             for pool in range(1):
                 pool = Healing(50)
@@ -613,10 +715,27 @@ def game():
             if collide(pool, player):
                 pools.remove(pool)
                 player.health += pool.power
+                player.checking_health()
 
             # Removes a healing pool when it has crossed the bottom of the screen
             if pool.y > current_height:
                 pools.remove(pool)
+
+        # Creates the shield power up
+        if shield_counter > 12:
+            for shield in range(1):
+                shield = Shield()
+                shields.append(shield)
+            shield_counter = 0
+
+        for shield in shields:
+            if collide(shield, player):
+                shields.remove(shield)
+                player.shield += 10
+                player.checking_shield()
+
+            if shield.y > current_height:
+                shields.remove(shield)
 
         # Moves the lasers of the player and detects if they have been collided with an other object
         player.move_lasers(-laser_velocity, enemies)
