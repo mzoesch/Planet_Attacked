@@ -17,6 +17,7 @@ User based:
 
 
 the Player now can enter the pause menu by pressing ESCAPE and can colse it again by the same key.
+
 ---------------------------------------
 
 Date: 22.09.2020
