@@ -538,7 +538,7 @@ def game():
     game_background = pygame.transform.scale(pygame.image.load(os.path.join("resources/backgrounds", "Game.png")), (current_width, current_height))
 
     # Making the background that is used when you die, the right size
-    gameover_background = pygame.transform.scale(pygame.image.load(os.path.join("resources/backgrounds", "Standard.png")), (current_width, current_height))
+    gameover_background = pygame.transform.scale(pygame.image.load(os.path.join("resources/backgrounds", "Game_Over.png")), (current_width, current_height))
 
     # Creating a font
     standard_font = pygame.font.SysFont("freesansbold.ttf", 64)
@@ -568,6 +568,7 @@ def game():
 
     # Creating the player
     player = Player(current_width / 2 - (IMG_PLAYER_SHIP.get_width() / 2), current_height - 100)
+    player.x = (current_width / 2) - (player.ship_img.get_width() / 2)
 
     # Clock
     clock = pygame.time.Clock()
@@ -710,8 +711,9 @@ def game():
             small_pool = 0
             big_pool = 0
 
-        # Removes Healing pool when it has been collided with the player
         for pool in pools:
+
+            # Removes healing pool when it has been collided with the player
             if collide(pool, player):
                 pools.remove(pool)
                 player.health += pool.power
@@ -729,11 +731,14 @@ def game():
             shield_counter = 0
 
         for shield in shields:
+
+            # Removes shield power up when it has been collided with the player
             if collide(shield, player):
                 shields.remove(shield)
                 player.shield += 10
                 player.checking_shield()
 
+            # Removes shield power up when it has crossed the bottom of the screen
             if shield.y > current_height:
                 shields.remove(shield)
 
@@ -746,6 +751,15 @@ def game():
         # Writes the score value to a file
         with open("assets/sv.txt", "w") as svf:
             svf.write('%d' % score_value)
+
+        # Opens last highscore
+        with open("assets/hs.txt", "r") as hsf_read_after_play:
+            old_highscore_value = hsf_read_after_play.read()
+
+        # Checks if there is a new highscore
+        if int(score_value) > int(old_highscore_value):
+            with open("assets/hs.txt", "w") as hsf_write_after_play:
+                hsf_write_after_play.write(str(score_value))
 
         # (Re)setting everything to default value
         running_death = True

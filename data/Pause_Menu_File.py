@@ -27,9 +27,6 @@ def currents():
 
 # Function for the pause menu
 def pausemenu():
-    # Adding:
-    # New Screen
-    # Text; "Paused"; In Progress
 
     # Making variables global
     global paused_text_center_width
@@ -93,7 +90,7 @@ def pausemenu():
     running_pausemenu = True
 
     # Defining the pause menu background
-    pausemenu_background = pygame.transform.scale(pygame.image.load(os.path.join("resources/backgrounds", "Standard.png")), (current_width, current_height))
+    pausemenu_background = pygame.transform.scale(pygame.image.load(os.path.join("resources/backgrounds", "Pause_Menu.png")), (current_width, current_height))
 
     # Shows the background
     menuscreen.blit(pausemenu_background, (0, 0))

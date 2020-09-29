@@ -1,5 +1,5 @@
 # Created 26.06.2020
-# Last modified 22.09.2020
+# Last modified 29.09.2020
 # Creator @Magnus Zoeschinger
 
 import pygame
@@ -21,3 +21,6 @@ main()
 # Quitting the game
 pygame.quit()
 sys.exit()
+
+# FIXME: An issue when dying in game and respawn immediately (entering game 1 sec after dying screen is over)
+# FIXME: Powerups aren't been reset

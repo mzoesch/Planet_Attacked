@@ -1,4 +1,4 @@
---Version 1.4.0--
+--Version 1.5.0--
 Added the posibility to pause the game
 
 ---------------------------------------
@@ -6,20 +6,22 @@ Added the posibility to pause the game
 Code based:
 
 
-three files were added.
-1. "Pause_Menu_File.py" here is the pause menu programmed.
-2. "sv_pm.txt" An extra File where the current score is written in when entering the pause menu.
-3. "Tutorial_File.py" the tutorial will be programmed here.
+Changed the way how the resources are organized
+Many changes in naming etc.
+Added one new python files in data folder: The pause menu for the tutorial
+Added the beginning of the tutorial in the python file created last version
 
 ---------------------------------------
 
 User based:
 
+Complete new update for the main menu... 
+Now you have button in the menu.
+Settings doesn't work, but the game button and the tutorial button works fine...
 
-the Player now can enter the pause menu by pressing ESCAPE and can colse it again by the same key.
 
 ---------------------------------------
 
-Date: 22.09.2020
+Date: 29.09.2020
 
 ---------------------------------------

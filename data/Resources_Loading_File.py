@@ -31,6 +31,10 @@ IMG_HEALING_POOL_50 = pygame.image.load(os.path.join("resources/graphics", "Heal
 # Shield power up
 IMG_SHIELD_POWER_UP = pygame.image.load(os.path.join("resources/graphics", "Shield_Power_Up.png"))
 
+# Arrows
+IMG_ARROW_LEFT = pygame.image.load(os.path.join("resources/graphics", "Arrow_Left.png"))
+IMG_ARROW_RIGHT = pygame.image.load(os.path.join("resources/graphics", "Arrow_Right.png"))
+
 # Loading wav
 
 # Music

@@ -6,14 +6,17 @@ from data.WindowSize_File import *
 from data.Game_File import game
 from data.Tutorial_File import tutorial
 import os
+from pygame.locals import *
 
 # Creates the menu screen
 menuscreen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
+play_game = None
 
 
 # Mainmenu function
 def mainmenu():
 
+    global play_game
     global menuscreen
 
     # Getting the screen values of the monitor that the user is playing on
@@ -37,6 +40,7 @@ def mainmenu():
     exit_fullscreen_past_width = None
     exit_fullscreen_past_height = None
     running_mainmenu = True
+    clicked = False
 
     # Y-Value of the Highscore
     HIGHSCORE_TEXTY = 10
@@ -48,8 +52,18 @@ def mainmenu():
         with open("assets/hs.txt", "r") as hsf:
             highscore_value = hsf.read()
 
+        # Reads the last score from the file
+        with open("assets/sv.txt", "r") as sv_bs_f:
+            score_value_before_start = sv_bs_f.read()
+
+        # Checking if there is a new highscore
+        if score_value_before_start > highscore_value:
+            highscore_value = score_value_before_start
+            with open("assets/sv.txt", "w") as sv_bf_w_f:
+                sv_bf_w_f.write('%d' % int(score_value_before_start))
+
         # Renders it
-        HIGHSCORE_FONT = pygame.font.Font("freesansbold.ttf", 32)
+        HIGHSCORE_FONT = pygame.font.SysFont("jokerman", 32)
         rendered_highscore = HIGHSCORE_FONT.render(f"Highscore: {highscore_value}", True, (255, 0, 255))
 
         # Correct placement
@@ -58,6 +72,42 @@ def mainmenu():
 
         # Shows it
         menuscreen.blit(rendered_highscore, (x, y))
+
+    # Draws the buttons
+    def show_button(x, y, message, width, height, normal_color, active_color, purpose):
+
+        # Makes a button
+        button = pygame.Rect(x, y, width, height)
+
+        # Checking if a box was clicked or the cursor is over the button
+        if button.collidepoint((mx, my)):
+            pygame.draw.rect(menuscreen, active_color, button)
+            if clicked:
+                if purpose == "p":
+                    game()
+                elif purpose == "t":
+                    # FIXME: The tutorial won't reset when it is entered
+                    tutorial()
+                elif purpose == "s":
+                    pass
+        else:
+            pygame.draw.rect(menuscreen, normal_color, button)
+
+        # Creating and showing the labels
+
+        # Creates label
+        button_label = button_font.render(message, True, BLACK)
+
+        # Gets the size of the label
+        message_width, _ = pygame.Surface.get_size(button_label)
+        _, message_height = pygame.Surface.get_size(button_label)
+
+        # Calculating the right coordinates of the message on the button
+        message_x = (width / 2 - message_width / 2) + x
+        message_y = (height / 2 - message_height / 2) + y
+
+        # Printing it to the screen
+        menuscreen.blit(button_label, (message_x, message_y))
 
     # Main menu loop
     while running_mainmenu:
@@ -69,13 +119,57 @@ def mainmenu():
         _, current_height = pygame.display.get_surface().get_size()
 
         # Making the background the correct size
-        mainmenu_background = pygame.transform.scale(pygame.image.load(os.path.join("resources/backgrounds", "Menu.png")), (current_width, current_height))
+        mainmenu_background = pygame.transform.scale(pygame.image.load(os.path.join("resources/backgrounds", "Main_Menu.png")), (current_width, current_height))
 
         # Shows the background
         menuscreen.blit(mainmenu_background, (0, 0))
 
         # This line shows the highscore
         show_highscore(HIGHSCORE_TEXTY)
+
+        # Checking mouse coordinates
+        mx, _ = pygame.mouse.get_pos()
+        _, my = pygame.mouse.get_pos()
+
+        # Creating fonts
+        button_font = pygame.font.SysFont("Comic Sans MS", 40)
+        name_font = pygame.font.SysFont("digital7monottf", 128)
+        subtext_font = pygame.font.SysFont("snapitc", 32)
+
+        # Creating a standard color
+        BLACK = pygame.Color("black")
+
+        # Creating not standard colors
+        TITLE_BLUE = (0, 0, 204)
+        SUBTEXT_PINK = (255, 0, 127)
+
+        # Creating labels
+        NAME_LABEL = name_font.render("PLANET ATTACKED", True, TITLE_BLUE)
+        SUBTEXT_LABEL = subtext_font.render("CREATOR: Magnus Zoeschinger", True, SUBTEXT_PINK)
+
+        # Calculating coordinates
+        NAME_LABEL_WIDTH = pygame.Surface.get_width(NAME_LABEL)
+        name_label_x = (current_width - NAME_LABEL_WIDTH) / 2
+        SUBTEXT_LABEL_WIDTH = pygame.Surface.get_width(SUBTEXT_LABEL)
+        subtext_label_x = (current_width - SUBTEXT_LABEL_WIDTH) / 2
+        NAME_LABEL_HEIGHT = pygame.Surface.get_height(NAME_LABEL)
+        SUBTEXT_LABEL_HEIGHT = pygame.Surface.get_height(SUBTEXT_LABEL)
+        name_label_y = ((current_height - NAME_LABEL_HEIGHT) / 2) - SUBTEXT_LABEL_HEIGHT
+        subtext_label_y = name_label_y + SUBTEXT_LABEL_HEIGHT + 50
+
+        # Printing labels to screen
+        menuscreen.blit(NAME_LABEL, (name_label_x, name_label_y))
+        menuscreen.blit(SUBTEXT_LABEL, (subtext_label_x, subtext_label_y))
+
+        # Standard values for buttons
+        button_width = 170
+        button_height = 60
+        height_for_button = current_height - 80
+
+        # Drawing the buttons
+        show_button(current_width - 190, height_for_button, "Play", button_width, button_height, (0, 150, 0), (0, 255, 0), "p")
+        show_button(current_width - 190 - 170 - 20, height_for_button, "Tutorial", button_width, button_height, (226, 221, 79), (255, 247, 0), "t")
+        show_button(20, height_for_button, "Settings", button_width, button_height, (150, 0, 0), (255, 0, 0), "s")
 
         # Checking events
         for event in pygame.event.get():
@@ -154,6 +248,12 @@ def mainmenu():
                     pygame.quit()
                     quit()
                     break
+
+            # Detects mouse button clicks and sets clicked to False
+            clicked = False
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    clicked = True
 
         # Updates Display
         pygame.display.update()
