@@ -1,5 +1,6 @@
---Version 1.5.0--
-Added the posibility to pause the game
+--Version 1.5.1--
+Added the tutorial (well, at least the beginning)
+(This update only changed the changelog.txt file...)
 
 ---------------------------------------
 
