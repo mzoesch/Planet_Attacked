@@ -15,6 +15,7 @@ from data.Resources_Loading_File import SHIP_EXPLOSION
 from data.Resources_Loading_File import IMG_HEALING_POOL_25
 from data.Resources_Loading_File import IMG_HEALING_POOL_50
 from data.Resources_Loading_File import IMG_SHIELD_POWER_UP
+from data.Resources_Loading_File import IMG_FASTER_SHOOTING
 
 # Initialize the font
 pygame.font.init()
@@ -25,6 +26,7 @@ pygame.init()
 score_value = 0
 small_pool = 0
 shield_counter = 0
+faster_shooting_counter = 0
 mainexplosions = []
 pools = []
 
@@ -46,11 +48,13 @@ def currents():
 def score_adding(amount):
     global small_pool
     global score_value
+    global faster_shooting_counter
     global shield_counter
 
     score_value += amount
     small_pool += amount
     shield_counter += amount
+    faster_shooting_counter += amount
 
 
 # Explosion class
@@ -154,10 +158,6 @@ class Laser:
 # Class that has the purpose that I don't have to copy so much code
 class Ship:
 
-    # Defines how often you can shoot
-    # 30 equals 0.5 seconds because 30[COOL_DOWN] / 60[FPS] = 0.5[seconds]
-    COOL_DOWN = 30
-
     def __init__(self, x, y, health=100):
         self.x = x
         self.y = y
@@ -167,6 +167,10 @@ class Ship:
         self.laser_img_height = None
         self.lasers = []
         self.cool_down_counter = 0
+
+        # Defines how often you can shoot
+        # 30 equals 0.5 seconds because 30[COOL_DOWN] / 60[FPS] = 0.5[seconds]
+        self.cooldown_variable = 38
 
     # Draws the objects to the screen
     def draw(self, screen):
@@ -190,7 +194,7 @@ class Ship:
 
     # Counts the cooldown
     def cooldown(self):
-        if self.cool_down_counter >= self.COOL_DOWN:
+        if self.cool_down_counter >= self.cooldown_variable:
             self.cool_down_counter = 0
         elif self.cool_down_counter > 0:
             self.cool_down_counter += 1
@@ -397,9 +401,37 @@ class Shield:
         # return self.img.get_height()
 
 
+# Power up class for faster shooting
+class FasterShooting:
+    def __init__(self):
+        self.x = random.randrange(0, current_width - self.get_width())
+        self.y = random.randrange(-100, 0 - (self.get_height()))
+        self.img_not_converted = pygame.transform.scale(IMG_FASTER_SHOOTING, (25, 25))
+        self.img = self.img_not_converted
+        self.mask = pygame.mask.from_surface(self.img)
+
+    def draw(self, screen, velocity):
+        screen.blit(self.img, (self.x, self.y))
+        self.move(velocity)
+
+    def move(self, velocity):
+        self.y += velocity
+
+    # Gets the width of the power up
+    @staticmethod
+    def get_width():
+        return 25  # 'FasterShooting' object has no attribute 'img'
+        # return self.img.get_width()
+
+    # Gets the height of the power up
+    @staticmethod
+    def get_height():
+        return 25  # 'FasterShooting' object has no attribute 'img'
+        # return self.img.get_height()
+
 # TODO: Placements, structures that you can shoot through but enemies can't (Class)
 # TODO: New Hard Enemy, walks across the screen, but doesn't shoot - It has to touch the "line" (Class)
-# TODO: Power up, faster shooting (Class)
+
 
 # Detects if objects have been collided
 def collide(obj1, obj2):
@@ -415,6 +447,7 @@ def game():
     global score_value
     global small_pool
     global shield_counter
+    global faster_shooting_counter
 
     # Draws everything
     def draw_current_frame():
@@ -448,6 +481,10 @@ def game():
         # Drawing shield power up
         for current_shield in shields:
             current_shield.draw(gamescreen, shield_velocity)
+
+        # Drawing faster shooting power up
+        for current_faster_shooting in faster_shootings:
+            current_faster_shooting.draw(gamescreen, faster_shooting_velocity)
 
         # Draws the player
         player.draw(gamescreen)
@@ -561,8 +598,11 @@ def game():
     healing_velocity = 0.5
     big_pool = 0
     shields = []
+    faster_shootings = []
     shield_velocity = 0.5
     laser_velocity = 5
+    faster_shooting_max = 5
+    faster_shooting_velocity = 0.5
     if score_value != 0:
         score_value = 0
 
@@ -741,6 +781,25 @@ def game():
             # Removes shield power up when it has crossed the bottom of the screen
             if shield.y > current_height:
                 shields.remove(shield)
+
+        # Creates the faster_shooting power up
+        if faster_shooting_counter > 24 and faster_shooting_max > 0:
+            for faster_shooting in range(1):
+                faster_shooting = FasterShooting()
+                faster_shootings.append(faster_shooting)
+            faster_shooting_counter = 0
+            faster_shooting_max -= 1
+
+        for faster_shooting in faster_shootings:
+
+            # Removes faster shooting power up when it has been collided with the player
+            if collide(faster_shooting, player):
+                faster_shootings.remove(faster_shooting)
+                player.cooldown_variable -= 3
+
+            # Removes faster shooting power up when it has crossed the bottom of the screen
+            if faster_shooting.y > current_height:
+                faster_shootings.remove(faster_shooting)
 
         # Moves the lasers of the player and detects if they have been collided with an other object
         player.move_lasers(-laser_velocity, enemies)

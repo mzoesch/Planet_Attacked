@@ -1,28 +1,23 @@
---Version 1.5.1--
-Added the tutorial (well, at least the beginning)
-(This update only changed the changelog.txt file...)
+--Version 1.6.0--
+Added a power up that allows you to shoot faster.
 
 ---------------------------------------
 
 Code based:
 
 
-Changed the way how the resources are organized
-Many changes in naming etc.
-Added one new python files in data folder: The pause menu for the tutorial
-Added the beginning of the tutorial in the python file created last version
+Added one file (img for power up)
 
 ---------------------------------------
 
 User based:
 
-Complete new update for the main menu... 
-Now you have button in the menu.
-Settings doesn't work, but the game button and the tutorial button works fine...
 
+New Power up that allows you to shoot faster.
+COOLDOWN was increased from 30 (= 0.5 sec.) to 38, but can be decreased with new power up to 25.
 
 ---------------------------------------
 
-Date: 29.09.2020
+Date: 30.09.2020
 
 ---------------------------------------
