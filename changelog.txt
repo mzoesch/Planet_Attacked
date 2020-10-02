@@ -14,7 +14,7 @@ User based:
 
 
 NEW Enemy...
-An enemy that dosen' shoot but is much harder to shoot at.
+An enemy that dosen't shoot but is much harder to shoot at.
 Gives 2 points if you shoot it with a laser, but also, if you hit him with your ship, takes you 40 hp away.
 If it crossed the read line it will take you 2 lives and if you hit it with your ship it will add 4 scores.
 
