@@ -800,6 +800,7 @@ def game():
             # Removes faster shooting power up when it has crossed the bottom of the screen
             if faster_shooting.y > current_height:
                 faster_shootings.remove(faster_shooting)
+                faster_shooting_max += 1
 
         # Moves the lasers of the player and detects if they have been collided with an other object
         player.move_lasers(-laser_velocity, enemies)
