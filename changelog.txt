@@ -1,22 +1,24 @@
---Version 1.7.0--
-New hard enemy was added
+--Version 1.7.1--
+New hard enemy is now even stronger and bug fixed
 
 ---------------------------------------
 
 Code based:
 
 
-Added one file (img for new enemy)
+Added two files (imgs for new enemy)
+Because they look different if you hit the one time
+
+bug fixed: Power up are now being reseted when starting the game, without closing the window.
 
 ---------------------------------------
 
 User based:
 
 
-NEW enemy...
-An enemy that dosen't shoot but is much harder to shoot at.
-Gives 2 points if you shoot it with a laser, but also, if you hit him with your ship, takes you 40 hp away.
-If it crossed the read line it will take you 2 lives and if you hit it with your ship it will add 4 scores.
+New enemy is now stronger...
+You have to hit him 3 times so that it will be destroied.
+
 
 ---------------------------------------
 

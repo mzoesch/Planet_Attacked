@@ -16,7 +16,9 @@ from data.Resources_Loading_File import IMG_HEALING_POOL_25
 from data.Resources_Loading_File import IMG_HEALING_POOL_50
 from data.Resources_Loading_File import IMG_SHIELD_POWER_UP
 from data.Resources_Loading_File import IMG_FASTER_SHOOTING
-from data.Resources_Loading_File import IMG_HARDENEMY_SHIP
+from data.Resources_Loading_File import IMG_HARDENEMY_SHIP_1
+from data.Resources_Loading_File import IMG_HARDENEMY_SHIP_2
+from data.Resources_Loading_File import IMG_HARDENEMY_SHIP_3
 
 # Initialize the font
 pygame.font.init()
@@ -268,21 +270,35 @@ class Player(Ship):
                 for hardenemy in hardenemies:
                     if laser.collision(hardenemy):
 
-                        # If the ship laser has collided with the hard enemy
-                        for explosion in range(1):
-                            explosion = Explosion(hardenemy.x, hardenemy.y)
-                            explosion.x += 35
-                            explosion.y += 35
-                            mainexplosions.append(explosion)
-                        explosion_sound = pygame.mixer.Sound(SHIP_EXPLOSION)
-                        explosion_sound.play()
+                        # The different broken status of the hard enemy
+                        if hardenemy.broken_status == 0:
+                            hardenemy.broken_status += 1
+                            hardenemy.img = pygame.transform.scale(IMG_HARDENEMY_SHIP_2, (70, 70))
+                            if laser in self.lasers:
+                                self.lasers.remove(laser)
+                        elif hardenemy.broken_status == 1:
+                            hardenemy.broken_status += 1
+                            hardenemy.img = pygame.transform.scale(IMG_HARDENEMY_SHIP_3, (70, 70))
+                            if laser in self.lasers:
+                                self.lasers.remove(laser)
+                        elif hardenemy.broken_status == 2:
+                            # If the ship laser has collided with the hard enemy
+                            for explosion in range(1):
+                                explosion = Explosion(hardenemy.x, hardenemy.y)
+                                explosion.x += 35
+                                explosion.y += 35
+                                mainexplosions.append(explosion)
+                            explosion_sound = pygame.mixer.Sound(SHIP_EXPLOSION)
+                            explosion_sound.play()
 
-                        # Respawns the hard enemy that was exploded
-                        hardenemy.y = random.randrange(-100 - hardenemy.get_height(), 0 - hardenemy.get_height())
-                        hardenemy.x = random.randrange(0, current_width - hardenemy.get_width())
-                        if laser in self.lasers:
-                            self.lasers.remove(laser)
-                        score_adding(2)
+                            # Respawns the hard enemy that was exploded
+                            hardenemy.y = random.randrange(-100 - hardenemy.get_height(), 0 - hardenemy.get_height())
+                            hardenemy.x = random.randrange(0, current_width - hardenemy.get_width())
+                            hardenemy.broken_status = 0
+                            hardenemy.img = pygame.transform.scale(IMG_HARDENEMY_SHIP_1, (70, 70))
+                            if laser in self.lasers:
+                                self.lasers.remove(laser)
+                            score_adding(2)
 
     # Draws the player
     def draw(self, window):
@@ -451,11 +467,19 @@ class FasterShooting:
 
 # Hard enemy class
 class HardEnemy:
+
+    # TODO: For version 1.7.01
+    # New images if you shoot the enemy
+    # At least 3 times
+    # New more enemies later in game
+
     def __init__(self,):
         self.x = None
         self.y = None
         self.velocity = 7
-        self.img = pygame.transform.scale(IMG_HARDENEMY_SHIP, (70, 70))
+        self.broken_status = 0
+        if self.broken_status == 0:
+            self.img = pygame.transform.scale(IMG_HARDENEMY_SHIP_1, (70, 70))
         self.mask = pygame.mask.from_surface(self.img)
 
     def move(self, x_velocity):
@@ -505,7 +529,9 @@ def game():
     global score_value
     global small_pool
     global shield_counter
+    global pools
     global faster_shooting_counter
+    global mainexplosions
 
     # Draws everything
     def draw_current_frame():
@@ -662,6 +688,8 @@ def game():
     healing_velocity = 0.5
     big_pool = 0
     shields = []
+    pools = []
+    mainexplosions = []
     faster_shootings = []
     shield_velocity = 0.5
     laser_velocity = 5
@@ -817,6 +845,8 @@ def game():
                 player.health -= 40
                 hardenemy.y = random.randrange(-100 - hardenemy.get_height(), 0 - hardenemy.get_height())
                 hardenemy.x = random.randrange(0, current_width - hardenemy.get_width())
+                hardenemy.broken_status = 0
+                hardenemy.img = pygame.transform.scale(IMG_HARDENEMY_SHIP_1, (70, 70))
                 score_adding(4)
 
             # Detects if an enemy has crossed the "line"
@@ -824,15 +854,24 @@ def game():
                 lives -= 2
                 hardenemy.x = random.randrange(0, current_width - hardenemy.get_width())
                 hardenemy.y = random.randrange(-100 - hardenemy.get_height(), 0 - hardenemy.get_height())
+                hardenemy.broken_status = 0
+                hardenemy.img = pygame.transform.scale(IMG_HARDENEMY_SHIP_1, (70, 70))
 
         # Creating hard enemies
-        if score_value == 0 and hardenemies_in_game == 0:
+        if score_value == 50 and hardenemies_in_game == 0:
             hardenemies_in_game += 1
             for hardenemy in range(hardenemies_in_game):
                 hardenemy = HardEnemy()
                 hardenemy.x = random.randrange(0, current_width - hardenemy.get_width())
                 hardenemy.y = random.randrange(-100 - hardenemy.get_height(), 0 - hardenemy.get_height())
+                hardenemies.append(hardenemy)
 
+        if score_value == 100 and hardenemies_in_game == 1:
+            hardenemies_in_game += 1
+            for hardenemy in range(1):
+                hardenemy = HardEnemy()
+                hardenemy.x = random.randrange(0, current_width - hardenemy.get_width())
+                hardenemy.y = random.randrange(-100 - hardenemy.get_height(), 0 - hardenemy.get_height())
                 hardenemies.append(hardenemy)
 
         # Creates the two different types of healing pools

@@ -23,4 +23,3 @@ pygame.quit()
 sys.exit()
 
 # FIXME: An issue when dying in game and respawn immediately (entering game 1 sec after dying screen is over)
-# FIXME: Powerups aren't been reset, when restarting the game without dying
