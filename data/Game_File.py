@@ -16,6 +16,7 @@ from data.Resources_Loading_File import IMG_HEALING_POOL_25
 from data.Resources_Loading_File import IMG_HEALING_POOL_50
 from data.Resources_Loading_File import IMG_SHIELD_POWER_UP
 from data.Resources_Loading_File import IMG_FASTER_SHOOTING
+from data.Resources_Loading_File import IMG_HARDENEMY_SHIP
 
 # Initialize the font
 pygame.font.init()
@@ -230,7 +231,7 @@ class Player(Ship):
         self.max_health = health
 
     # Moves the lasers and deletes them
-    def move_lasers(self, velocity, enemies):
+    def move_lasers_of_player(self, velocity, enemies, hardenemies):
 
         # Making score_value global
         global score_value
@@ -264,6 +265,24 @@ class Player(Ship):
                         if laser in self.lasers:
                             self.lasers.remove(laser)
                         score_adding(1)
+                for hardenemy in hardenemies:
+                    if laser.collision(hardenemy):
+
+                        # If the ship laser has collided with the hard enemy
+                        for explosion in range(1):
+                            explosion = Explosion(hardenemy.x, hardenemy.y)
+                            explosion.x += 35
+                            explosion.y += 35
+                            mainexplosions.append(explosion)
+                        explosion_sound = pygame.mixer.Sound(SHIP_EXPLOSION)
+                        explosion_sound.play()
+
+                        # Respawns the hard enemy that was exploded
+                        hardenemy.y = random.randrange(-100 - hardenemy.get_height(), 0 - hardenemy.get_height())
+                        hardenemy.x = random.randrange(0, current_width - hardenemy.get_width())
+                        if laser in self.lasers:
+                            self.lasers.remove(laser)
+                        score_adding(2)
 
     # Draws the player
     def draw(self, window):
@@ -429,8 +448,47 @@ class FasterShooting:
         return 25  # 'FasterShooting' object has no attribute 'img'
         # return self.img.get_height()
 
+
+# Hard enemy class
+class HardEnemy:
+    def __init__(self,):
+        self.x = None
+        self.y = None
+        self.velocity = 7
+        self.img = pygame.transform.scale(IMG_HARDENEMY_SHIP, (70, 70))
+        self.mask = pygame.mask.from_surface(self.img)
+
+    def move(self, x_velocity):
+        self.x += self.velocity
+        self.checking_boundaries(x_velocity)
+
+    def checking_boundaries(self, x_velocity):
+
+        # Right boundary
+        if self.x > current_width - self.img.get_width():
+            self.x = current_width - self.img.get_width()
+            self.velocity *= -1
+            self.y -= -x_velocity
+
+        # Left boundary
+        if self.x < 0:
+            self.x = 0
+            self.velocity *= -1
+            self.y -= -x_velocity
+
+    def draw(self, window):
+        window.blit(self.img, (self.x, self.y))
+
+    # Gets the width of the ship
+    def get_width(self):
+        return self.img.get_width()
+
+    # Gets the height of the ship
+    def get_height(self):
+        return self.img.get_height()
+
+
 # TODO: Placements, structures that you can shoot through but enemies can't (Class)
-# TODO: New Hard Enemy, walks across the screen, but doesn't shoot - It has to touch the "line" (Class)
 
 
 # Detects if objects have been collided
@@ -466,6 +524,10 @@ def game():
         # Draws the enemies
         for enemy_drawing in enemies:
             enemy_drawing.draw(gamescreen)
+
+        # Draws hard enemies
+        for hardenemy_drawing in hardenemies:
+            hardenemy_drawing.draw(gamescreen)
 
         # Draws the explosion of an enemy
         for current_explosion in mainexplosions:
@@ -583,7 +645,6 @@ def game():
     # Colors
     WHITE = pygame.Color("white")
 
-    # The number of enemies created each wave
     # Starting the game with one enemy
     enemies_in_game = 1
 
@@ -592,6 +653,9 @@ def game():
     running_game = True
     lives = 5
     enemies = []
+    hardenemies = []
+    hardenemy_x_velocity = 20
+    hardenemies_in_game = 0
     skip_game_over_text = False
     enemy_velocity = 1
     player_velocity = 5
@@ -726,7 +790,7 @@ def game():
                 ])
                 score_adding(2)
 
-            # Detects if an enemy has crossed the "line"
+            # Detects if an enemy has crossed the bottom of the screen
             elif enemy.y > current_height:  # Standard: current_height
                 lives -= 1
                 enemy.y = random.randrange(-100, 0) - enemy.get_height()
@@ -736,6 +800,40 @@ def game():
                     (pygame.transform.scale(IMG_ENEMY_SHIP_BLUE, (70, 70)), pygame.transform.scale(IMG_ENEMY_LASER_BLUE, (70, 70))),
                     (pygame.transform.scale(IMG_ENEMY_SHIP_GREEN, (70, 70)), pygame.transform.scale(IMG_ENEMY_LASER_GREEN, (70, 70)))
                 ])
+
+        # Moves the hard enemies
+        for hardenemy in hardenemies:
+            hardenemy.move(hardenemy_x_velocity)
+
+            # Spawns the hard enemy above the screen when it has collided with the player
+            if collide(hardenemy, player):
+                for explosion in range(1):
+                    explosion = Explosion(hardenemy.x, hardenemy.y)
+                    explosion.x += 35
+                    explosion.y += 35
+                    mainexplosions.append(explosion)
+                explosion_sound = pygame.mixer.Sound(SHIP_EXPLOSION)
+                explosion_sound.play()
+                player.health -= 40
+                hardenemy.y = random.randrange(-100 - hardenemy.get_height(), 0 - hardenemy.get_height())
+                hardenemy.x = random.randrange(0, current_width - hardenemy.get_width())
+                score_adding(4)
+
+            # Detects if an enemy has crossed the "line"
+            elif hardenemy.y > one_third_of_screen():  # Standard: current_height
+                lives -= 2
+                hardenemy.x = random.randrange(0, current_width - hardenemy.get_width())
+                hardenemy.y = random.randrange(-100 - hardenemy.get_height(), 0 - hardenemy.get_height())
+
+        # Creating hard enemies
+        if score_value == 0 and hardenemies_in_game == 0:
+            hardenemies_in_game += 1
+            for hardenemy in range(hardenemies_in_game):
+                hardenemy = HardEnemy()
+                hardenemy.x = random.randrange(0, current_width - hardenemy.get_width())
+                hardenemy.y = random.randrange(-100 - hardenemy.get_height(), 0 - hardenemy.get_height())
+
+                hardenemies.append(hardenemy)
 
         # Creates the two different types of healing pools
         if small_pool > 17 and not big_pool == 5:
@@ -803,7 +901,7 @@ def game():
                 faster_shooting_max += 1
 
         # Moves the lasers of the player and detects if they have been collided with an other object
-        player.move_lasers(-laser_velocity, enemies)
+        player.move_lasers_of_player(-laser_velocity, enemies, hardenemies)
 
     # Game over function
     def death():

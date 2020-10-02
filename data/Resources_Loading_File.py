@@ -18,6 +18,7 @@ IMG_PLAYER_LASER = pygame.image.load(os.path.join("resources/graphics", "Player_
 IMG_ENEMY_SHIP_RED = pygame.image.load(os.path.join("resources/graphics", "Enemy_Ship_Red.png"))
 IMG_ENEMY_SHIP_GREEN = pygame.image.load(os.path.join("resources/graphics", "Enemy_Ship_Green.png"))
 IMG_ENEMY_SHIP_BLUE = pygame.image.load(os.path.join("resources/graphics", "Enemy_Ship_Blue.png"))
+IMG_HARDENEMY_SHIP = pygame.image.load(os.path.join("resources/graphics", "HardEnemy_Ship.png"))
 
 # Enemy lasers
 IMG_ENEMY_LASER_RED = pygame.image.load(os.path.join("resources/graphics", "Enemy_Laser_Red.png"))
