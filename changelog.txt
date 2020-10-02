@@ -1,23 +1,22 @@
---Version 1.6.0--
-Added a power up that allows you to shoot faster.
+--Version 1.6.1--
+Bug fixed
 
 ---------------------------------------
 
 Code based:
 
-
-Added one file (img for power up)
+Nothing
 
 ---------------------------------------
 
 User based:
 
 
-New Power up that allows you to shoot faster.
-COOLDOWN was increased from 30 (= 0.5 sec.) to 38, but can be decreased with new power up to 25.
+Fixed a bug...
+If the faster shooting power up has crossed the line no new one would spawn.
 
 ---------------------------------------
 
-Date: 30.09.2020
+Date: 02.10.2020
 
 ---------------------------------------
