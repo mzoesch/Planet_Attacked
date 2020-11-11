@@ -1,27 +1,22 @@
---Version 1.7.1--
-New hard enemy is now even stronger and bug fixed
+--Version 2.0.01--Finished--
+App is now finished
 
 ---------------------------------------
 
 Code based:
 
 
-Added two files (imgs for new enemy)
-Because they look different if you hit the one time
-
-bug fixed: Power up are now being reseted when starting the game, without closing the window.
+No code was deleted. But the access for tut and settings was #-out.
 
 ---------------------------------------
 
 User based:
 
 
-New enemy is now stronger...
-You have to hit him 3 times so that it will be destroied.
-
+Tutorial and settings can't be used anymore - they didn't work really good - so it dosen't matter
 
 ---------------------------------------
 
-Date: 02.10.2020
+Date: 11.11.2020
 
 ---------------------------------------

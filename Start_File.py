@@ -1,5 +1,6 @@
 # Created 26.06.2020
-# Last modified 02.10.2020
+# Last modified 11.11.2020
+# Status: Finished
 # Creator @Magnus Zoeschinger
 
 import pygame

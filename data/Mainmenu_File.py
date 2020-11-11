@@ -7,16 +7,21 @@ from data.Game_File import game
 from data.Tutorial_File import tutorial
 import os
 from pygame.locals import *
+from data.Settings_File import settings
 
 # Creates the menu screen
 menuscreen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 play_game = None
+
+# Declaring variables
+clicked = False
 
 
 # Mainmenu function
 def mainmenu():
 
     global play_game
+    global clicked
     global menuscreen
 
     # Getting the screen values of the monitor that the user is playing on
@@ -76,6 +81,8 @@ def mainmenu():
     # Draws the buttons
     def show_button(x, y, message, width, height, normal_color, active_color, purpose):
 
+        global clicked
+
         # Makes a button
         button = pygame.Rect(x, y, width, height)
 
@@ -85,11 +92,14 @@ def mainmenu():
             if clicked:
                 if purpose == "p":
                     game()
+                    clicked = False
                 elif purpose == "t":
-                    # FIXME: The tutorial won't reset when it is entered
-                    tutorial()
+                    # tutorial()
+                    clicked = False
                 elif purpose == "s":
-                    pass
+                    # settings()
+                    clicked = False
+
         else:
             pygame.draw.rect(menuscreen, normal_color, button)
 
@@ -135,9 +145,11 @@ def mainmenu():
         button_font = pygame.font.SysFont("Comic Sans MS", 40)
         name_font = pygame.font.SysFont("digital7monottf", 128)
         subtext_font = pygame.font.SysFont("snapitc", 32)
+        warning_font = pygame.font.SysFont("centuryschoolbook", 16)
 
         # Creating a standard color
         BLACK = pygame.Color("black")
+        RED = pygame.Color("red")
 
         # Creating not standard colors
         TITLE_BLUE = (0, 0, 204)
@@ -146,6 +158,7 @@ def mainmenu():
         # Creating labels
         NAME_LABEL = name_font.render("PLANET ATTACKED", True, TITLE_BLUE)
         SUBTEXT_LABEL = subtext_font.render("CREATOR: Magnus Zoeschinger", True, SUBTEXT_PINK)
+        WARNING_LABEL = warning_font.render("Settings and Tutorial are not available.", True, RED)
 
         # Calculating coordinates
         NAME_LABEL_WIDTH = pygame.Surface.get_width(NAME_LABEL)
@@ -156,10 +169,12 @@ def mainmenu():
         SUBTEXT_LABEL_HEIGHT = pygame.Surface.get_height(SUBTEXT_LABEL)
         name_label_y = ((current_height - NAME_LABEL_HEIGHT) / 2) - SUBTEXT_LABEL_HEIGHT
         subtext_label_y = name_label_y + SUBTEXT_LABEL_HEIGHT + 50
+        WARNING_LABEL_x, WARNING_LABEL_y = 10, 10
 
         # Printing labels to screen
         menuscreen.blit(NAME_LABEL, (name_label_x, name_label_y))
         menuscreen.blit(SUBTEXT_LABEL, (subtext_label_x, subtext_label_y))
+        menuscreen.blit(WARNING_LABEL, (WARNING_LABEL_x, WARNING_LABEL_y))
 
         # Standard values for buttons
         button_width = 170
@@ -240,7 +255,8 @@ def mainmenu():
                 # TODO: A Tutorial should be added; Maybe with some buttons - should be at the end of the project
                 # Entering tutorial
                 if event.key == pygame.K_t:
-                    tutorial()
+                    # tutorial()
+                    pass
 
                 # Quitting the mainmenu by pressing "Q"
                 if event.key == pygame.K_q:
@@ -249,11 +265,16 @@ def mainmenu():
                     quit()
                     break
 
+                # Settings
+                if event.key == pygame.K_s:
+                    # settings()
+                    pass
+
             # Detects mouse button clicks and sets clicked to False
             clicked = False
             if event.type == MOUSEBUTTONDOWN:
                 if event.button == 1:
                     clicked = True
 
-        # Updates Display
+        # Updates display
         pygame.display.update()

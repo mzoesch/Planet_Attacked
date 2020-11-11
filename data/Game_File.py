@@ -468,11 +468,6 @@ class FasterShooting:
 # Hard enemy class
 class HardEnemy:
 
-    # TODO: For version 1.7.01
-    # New images if you shoot the enemy
-    # At least 3 times
-    # New more enemies later in game
-
     def __init__(self,):
         self.x = None
         self.y = None
@@ -776,7 +771,7 @@ def game():
         movement()
 
         # Moves the enemies and lasers
-        for enemy in enemies[:]:
+        for enemy in enemies:
             enemy.move(enemy_velocity)
             enemy.move_lasers(laser_velocity, player)
 
