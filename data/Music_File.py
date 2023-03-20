@@ -1,7 +1,7 @@
 import random
 import pygame
 from data.Resources_Loading_File import SONG_ONE
-from data.Resources_Loading_File import SONG_TWO
+# from data.Resources_Loading_File import SONG_TWO
 
 # Random background music
 # Music lives forever
@@ -12,9 +12,9 @@ stop_music = False
 # TODO: Maybe add some new songs
 # All the songs that can be played
 background_songs = [
-        SONG_ONE,
-        SONG_TWO
-    ]
+    SONG_ONE,
+    # SONG_TWO
+]
 
 
 # The actual function that plays the music
